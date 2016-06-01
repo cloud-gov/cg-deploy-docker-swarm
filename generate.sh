@@ -15,6 +15,7 @@ fi
 
 spiff merge \
   $SCRIPTPATH/deployment.yml \
+  $SCRIPTPATH/jobs-production.yml \
   $SCRIPTPATH/services.yml \
   $SECRETS \
   > $MANIFEST

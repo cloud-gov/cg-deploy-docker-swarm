@@ -103,6 +103,7 @@ resource_pools:
       size: 2048
       type: gp2
 jobs:
+- <<: (( merge ))
 - name: broker
   templates:
   - name: cf-containers-broker
@@ -113,64 +114,6 @@ jobs:
     release: newrelic
   instances: 1
   resource_pool: broker
-  networks:
-  - name: default
-    default:
-    - dns
-    - gateway
-- name: docker-compute
-  templates:
-  - name: docker
-    release: docker
-  - name: newrelic-monitor
-    release: newrelic
-  instances: 5
-  resource_pool: compute
-  persistent_disk_pool: docker-ssd
-  networks:
-  - name: default
-    default:
-    - dns
-    - gateway
-- name: docker-highmem
-  templates:
-  - name: docker
-    release: docker
-  - name: newrelic-monitor
-    release: newrelic
-  - name: collectd
-    release: collectd
-  instances: 3
-  resource_pool: highmem
-  persistent_disk_pool: docker-ssd
-  networks:
-  - name: default
-    default:
-    - dns
-    - gateway
-- name: docker-compute-reserved
-  templates:
-  - name: docker
-    release: docker
-  - name: newrelic-monitor
-    release: newrelic
-  instances: 1
-  resource_pool: compute-reserved
-  persistent_disk_pool: docker-ssd
-  networks:
-  - name: default
-    default:
-    - dns
-    - gateway
-- name: docker
-  templates:
-  - name: docker
-    release: docker
-  - name: newrelic-monitor
-    release: newrelic
-  instances: 5
-  resource_pool: default
-  persistent_disk_pool: docker-ssd
   networks:
   - name: default
     default:
@@ -218,21 +161,7 @@ properties:
   swarm_manager:
     strategy: spread
     overcomit: 1
-    docker_nodes:
-    - 0.docker.default.cf-docker-swarm-broker.bosh
-    - 1.docker.default.cf-docker-swarm-broker.bosh
-    - 2.docker.default.cf-docker-swarm-broker.bosh
-    - 3.docker.default.cf-docker-swarm-broker.bosh
-    - 4.docker.default.cf-docker-swarm-broker.bosh
-    - 0.docker-compute.default.cf-docker-swarm-broker.bosh
-    - 1.docker-compute.default.cf-docker-swarm-broker.bosh
-    - 2.docker-compute.default.cf-docker-swarm-broker.bosh
-    - 3.docker-compute.default.cf-docker-swarm-broker.bosh
-    - 4.docker-compute.default.cf-docker-swarm-broker.bosh
-    - 0.docker-compute-reserved.default.cf-docker-swarm-broker.bosh
-    - 0.docker-highmem.default.cf-docker-swarm-broker.bosh
-    - 1.docker-highmem.default.cf-docker-swarm-broker.bosh
-    - 2.docker-highmem.default.cf-docker-swarm-broker.bosh
+    docker_nodes: (( merge ))
   nats: (( merge ))
   cf: (( merge ))
   fetch_containers:
