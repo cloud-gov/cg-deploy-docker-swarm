@@ -1,0 +1,254 @@
+meta:
+  environment: ~
+  releases:
+  - name: docker
+    version: latest
+  - name: newrelic
+    version: latest
+  - name: collectd
+    version: latest
+  default_env:
+    # Default vcap & root password on deployed VMs (ie c1oudc0w)
+    # Generated using mkpasswd -m sha-512
+    bosh:
+      password: (( merge || "$6$4gDD3aV0rdqlrKC$2axHCxGKIObs6tAmMTqYCspcdvQXh3JJcvWOY2WGb4SrdXtnCyNaWlrf3WEqvYR2MYizEGp3kMmbpwBC6jsHt0" ))
+
+
+name: (( meta.environment ))
+director_uuid: (( merge ))
+
+releases: (( merge || meta.releases ))
+
+compilation:
+  workers: 1
+  network: default
+  reuse_compilation_vms: true
+  cloud_properties:
+    instance_type: c3.large
+
+update:
+  canaries: 0
+  canary_watch_time: 30000-240000
+  update_watch_time: 30000-240000
+  max_in_flight: 32
+  serial: false
+
+networks: (( merge ))
+
+disk_pools:
+- name: docker-ssd
+  disk_size: 262144
+  cloud_properties:
+    type: gp2
+
+resource_pools:
+- name: highmem
+  network: default
+  stemcell:
+    name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+    version: 3202
+  cloud_properties:
+    instance_type: m4.xlarge
+    ephemeral_disk:
+      size: 16384
+      type: gp2
+- name: compute-reserved
+  network: default
+  stemcell:
+    name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+    version: 3148
+  cloud_properties:
+    instance_type: c4.2xlarge
+    ephemeral_disk:
+      size: 16384
+      type: gp2
+- name: compute
+  network: default
+  stemcell:
+    name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+    version: 3062
+  cloud_properties:
+    instance_type: c4.xlarge
+    ephemeral_disk:
+      size: 16384
+      type: gp2
+- name: default
+  network: default
+  stemcell:
+    name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+    version: 2989
+  cloud_properties:
+    instance_type: m3.large
+    ephemeral_disk:
+      size: 16384
+      type: gp2
+- name: broker
+  network: default
+  stemcell:
+    name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+    version: 2989
+  cloud_properties:
+    instance_type: m3.medium
+    ephemeral_disk:
+      size: 2048
+      type: gp2
+- name: errand
+  network: default
+  stemcell:
+    name: bosh-aws-xen-hvm-ubuntu-trusty-go_agent
+    version: 2989
+  cloud_properties:
+    instance_type: m3.medium
+    ephemeral_disk:
+      size: 2048
+      type: gp2
+jobs:
+- name: broker
+  templates:
+  - name: cf-containers-broker
+    release: docker
+  - name: swarm_manager
+    release: docker
+  - name: newrelic-monitor
+    release: newrelic
+  instances: 1
+  resource_pool: broker
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+- name: docker-compute
+  templates:
+  - name: docker
+    release: docker
+  - name: newrelic-monitor
+    release: newrelic
+  instances: 5
+  resource_pool: compute
+  persistent_disk_pool: docker-ssd
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+- name: docker-highmem
+  templates:
+  - name: docker
+    release: docker
+  - name: newrelic-monitor
+    release: newrelic
+  - name: collectd
+    release: collectd
+  instances: 3
+  resource_pool: highmem
+  persistent_disk_pool: docker-ssd
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+- name: docker-compute-reserved
+  templates:
+  - name: docker
+    release: docker
+  - name: newrelic-monitor
+    release: newrelic
+  instances: 1
+  resource_pool: compute-reserved
+  persistent_disk_pool: docker-ssd
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+- name: docker
+  templates:
+  - name: docker
+    release: docker
+  - name: newrelic-monitor
+    release: newrelic
+  instances: 5
+  resource_pool: default
+  persistent_disk_pool: docker-ssd
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+- name: broker-registrar
+  templates:
+  - name: broker-registrar
+    release: docker
+  instances: 1
+  resource_pool: errand
+  lifecycle: errand
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+- name: fetch-containers
+  templates:
+  - name: fetch-containers
+    release: docker
+  instances: 1
+  resource_pool: errand
+  lifecycle: errand
+  networks:
+  - name: default
+- name: broker-deregistrar
+  templates:
+  - name: broker-deregistrar
+    release: docker
+  instances: 1
+  resource_pool: errand
+  lifecycle: errand
+  networks:
+  - name: default
+    default:
+    - dns
+    - gateway
+properties:
+  collectd:
+    riemann_server: 0.monitoring.monitoring.monitoring-prod.bosh
+  newrelic: (( merge ))
+  docker:
+    tcp_address: 0.0.0.0
+  swarm_manager:
+    strategy: spread
+    overcomit: 1
+    docker_nodes:
+    - 0.docker.default.cf-docker-swarm-broker.bosh
+    - 1.docker.default.cf-docker-swarm-broker.bosh
+    - 2.docker.default.cf-docker-swarm-broker.bosh
+    - 3.docker.default.cf-docker-swarm-broker.bosh
+    - 4.docker.default.cf-docker-swarm-broker.bosh
+    - 0.docker-compute.default.cf-docker-swarm-broker.bosh
+    - 1.docker-compute.default.cf-docker-swarm-broker.bosh
+    - 2.docker-compute.default.cf-docker-swarm-broker.bosh
+    - 3.docker-compute.default.cf-docker-swarm-broker.bosh
+    - 4.docker-compute.default.cf-docker-swarm-broker.bosh
+    - 0.docker-compute-reserved.default.cf-docker-swarm-broker.bosh
+    - 0.docker-highmem.default.cf-docker-swarm-broker.bosh
+    - 1.docker-highmem.default.cf-docker-swarm-broker.bosh
+    - 2.docker-highmem.default.cf-docker-swarm-broker.bosh
+  nats: (( merge ))
+  cf: (( merge ))
+  fetch_containers:
+    docker_url: tcp://0.broker.default.cf-docker-swarm-broker.bosh:2375
+  broker:
+    name: (( merge ))
+    host: (( merge ))
+    username: (( merge ))
+    password: (( merge ))
+    cookie_secret: (( merge ))
+    component_name: (( merge ))
+    docker_url: (( merge ))
+    protocol: https
+    port: 443
+    max_containers: 150
+    allocate_docker_host_ports: true
+    requires:
+    - syslog_drain
+    services: (( merge ))

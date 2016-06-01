@@ -1,0 +1,446 @@
+meta:
+  service_secrets: (( merge ))
+
+properties:
+  broker:
+    services:
+    - id: cacb3cb5-1410-4f79-ba95-3048a7e49842
+      name: elk
+      description: Elasticsearch, Logstash and Kibana
+      bindable: true
+      tags:
+      - elk
+      metadata:
+        displayName: ELK
+        longDescription: ELK
+        providerDisplayName: 18F
+        documentationUrl: ''
+        supportUrl: ''
+      requires:
+      - syslog_drain
+      dashboard_client:
+        id: elk-client
+        secret: (( meta.service_secrets.elk ))
+        redirect_uri: http://127.0.0.1:3000/manage/auth/cloudfoundry/callback
+      plans:
+      - id: c13b8dae-98fd-4ef2-9473-3ae92cad7281
+        name: standard
+        syslog_drain_port: 5000/tcp
+        syslog_drain_protocol: syslog
+        container:
+          backend: docker
+          image: 18fgsa/elk-docker
+          tag: latest
+          persistent_volumes:
+          - "/data"
+        credentials:
+          username:
+            key: ES_USERNAME
+            value: es
+          password:
+            key: ES_PASSWORD
+          uri:
+            prefix: http
+            port: 5601/tcp
+        description: medium
+        metadata:
+          costs:
+          - amount:
+              usd: 0
+            unit: MONTHLY
+          bullets:
+          - ELK Stack - Elasticsearch 1.7.1, Logstash 1.5.4, Kibana 4.1.1
+    - id: bb97d584-baf8-463d-8878-71cefcd46634
+      name: elasticsearch-swarm-1.7.1
+      description: Elasticsearch 1.7.1
+      bindable: true
+      tags:
+      - elasticsearch171
+      - elasticsearch
+      - search
+      metadata:
+        displayName: 'Elasticsearch 1.7.1: 3G / 3x CPU'
+        longDescription: A Elasticsearch 1.7.1 service
+        providerDisplayName: 18F
+        documentationUrl: ''
+        supportUrl: ''
+      dashboard_client:
+        id: swarm-elasticsearch171-client
+        secret: (( meta.service_secrets.es ))
+        redirect_uri: http://127.0.0.1:3000/manage/auth/cloudfoundry/callback
+      plans:
+      - id: 56f87778-0646-449c-99dd-fa33ea97d032
+        name: 1x
+        container:
+          backend: docker
+          cpu_shares: 1024
+          environment:
+          - ES_HEAP_SIZE=1g
+          image: 18fgsa/docker-elasticsearch
+          memory: 1536m
+          memory_swap: 0m
+          persistent_volumes:
+          - "/data"
+          tag: v1.7.1
+        credentials:
+          username:
+            key: ES_USERNAME
+            value: es
+          password:
+            key: ES_PASSWORD
+          uri:
+            prefix: http
+            port: 9200/tcp
+        description: medium
+        metadata:
+          costs:
+          - amount:
+              usd: 0
+            unit: MONTHLY
+          bullets:
+          - Elasticsearch 1.7.1 - 1GB Heap
+      - id: 3caff8d4-48f9-429a-a951-50e4141bf206
+        name: 3x
+        container:
+          backend: docker
+          cpu_shares: 3072
+          environment:
+          - ES_HEAP_SIZE=3g
+          image: 18fgsa/docker-elasticsearch
+          memory: 3584m
+          memory_swap: 0m
+          persistent_volumes:
+          - "/data"
+          tag: v1.7.1
+        credentials:
+          username:
+            key: ES_USERNAME
+            value: es
+          password:
+            key: ES_PASSWORD
+          uri:
+            prefix: http
+            port: 9200/tcp
+        description: medium
+        metadata:
+          costs:
+          - amount:
+              usd: 0
+            unit: MONTHLY
+          bullets:
+          - Elasticsearch 1.7.1 - 3G Heap
+      - id: 98a87da4-710f-4723-b2eb-0d8efb14e06a
+        name: 6x
+        container:
+          backend: docker
+          cpu_shares: 6144
+          environment:
+          - ES_HEAP_SIZE=6g
+          image: 18fgsa/docker-elasticsearch
+          memory: 6656m
+          memory_swap: 0m
+          persistent_volumes:
+          - "/data"
+          tag: v1.7.1
+        credentials:
+          username:
+            key: ES_USERNAME
+            value: es
+          password:
+            key: ES_PASSWORD
+          uri:
+            prefix: http
+            port: 9200/tcp
+        description: medium
+        metadata:
+          costs:
+          - amount:
+              usd: 0
+            unit: MONTHLY
+          bullets:
+          - Elasticsearch 1.7.1 - 6GB Heap
+    - id: 45102ef0-1cf2-4a32-a503-6f279e298a01
+      name: elasticsearch-swarm-1.7.5
+      description: Elasticsearch 1.7.5
+      bindable: true
+      tags:
+      - elasticsearch175
+      - elasticsearch
+      - search
+      metadata:
+        displayName: 'Elasticsearch 1.7.5: 6G / 6x CPU'
+        longDescription: A Elasticsearch 1.7.5 service
+        providerDisplayName: 18F
+        documentationUrl: ''
+        supportUrl: ''
+      dashboard_client:
+        id: swarm-elasticsearch175-client
+        secret: (( meta.service_secrets.es175 ))
+        redirect_uri: http://127.0.0.1:3000/manage/auth/cloudfoundry/callback
+      plans:
+      - id: ee0d4da6-98aa-4482-8188-d7130202837e
+        name: 6x
+        container:
+          backend: docker
+          cpu_shares: 6144
+          environment:
+          - ES_HEAP_SIZE=6g
+          image: 18fgsa/docker-elasticsearch
+          memory: 6656m
+          memory_swap: 0m
+          persistent_volumes:
+          - "/data"
+          tag: v1.7.5
+        credentials:
+          username:
+            key: ES_USERNAME
+            value: es
+          password:
+            key: ES_PASSWORD
+          uri:
+            prefix: http
+            port: 9200/tcp
+        description: Elasticsearch 1.7.5 - 6X Shared CPU / 6GB Heap
+        metadata:
+          costs:
+          - amount:
+              usd: 0
+            unit: MONTHLY
+          bullets:
+          - Elasticsearch 1.7.5 - 6X Shared CPU / 6GB Heap
+      - id: ac750e34-efaa-4847-96af-c9ef961acf12
+        name: 3x
+        container:
+          backend: docker
+          cpu_shares: 3072
+          environment:
+          - ES_HEAP_SIZE=3g
+          image: 18fgsa/docker-elasticsearch
+          memory: 3584m
+          memory_swap: 0m
+          persistent_volumes:
+          - "/data"
+          tag: v1.7.5
+        credentials:
+          username:
+            key: ES_USERNAME
+            value: es
+          password:
+            key: ES_PASSWORD
+          uri:
+            prefix: http
+            port: 9200/tcp
+        description: Elasticsearch 1.7.5 - 3X Shared CPU / 3GB Heap
+        metadata:
+          costs:
+          - amount:
+              usd: 0
+            unit: MONTHLY
+          bullets:
+          - Elasticsearch 1.7.5 - 3X Shared CPU / 3GB Heap
+      - id: 908fa3eb-264e-4574-b9ba-ef60fb656554
+        name: 1x
+        container:
+          backend: docker
+          cpu_shares: 1024
+          environment:
+          - ES_HEAP_SIZE=1g
+          image: 18fgsa/docker-elasticsearch
+          memory: 1536m
+          memory_swap: 0m
+          persistent_volumes:
+          - "/data"
+          tag: v1.7.5
+        credentials:
+          username:
+            key: ES_USERNAME
+            value: es
+          password:
+            key: ES_PASSWORD
+          uri:
+            prefix: http
+            port: 9200/tcp
+        description: Elasticsearch 1.7.5 - 1X Shared CPU / 1GB Heap
+        metadata:
+          costs:
+          - amount:
+              usd: 0
+            unit: MONTHLY
+          bullets:
+          - Elasticsearch 1.7.5 - 1X Shared CPU / 1GB Heap
+    - id: c1380a4f-8ba1-4f2f-9966-cf9c83ef3965
+      name: redis28-swarm
+      description: Redis 2.8 service for application development and testing
+      bindable: true
+      tags:
+      - redis28
+      - redis
+      - key-value
+      metadata:
+        displayName: Redis 2.8
+        longDescription: A Redis 2.8 service for development and testing running inside
+          a Docker container
+        providerDisplayName: cloud.gov
+        documentationUrl: http://docs.cloud.gov
+        supportUrl: http://docs.cloud.gov
+      dashboard_client:
+        id: p-redis28-swarm-client
+        secret: (( meta.service_secrets.redis ))
+        redirect_uri: https://cf-containers-broker.18f.gov/manage/auth/cloudfoundry/callback
+      plans:
+      - id: 846227e8-f68a-4a6b-b4ef-970e81658e96
+        name: standard
+        container:
+          backend: docker
+          image: frodenas/redis
+          tag: '2.8'
+          persistent_volumes:
+          - "/data"
+        credentials:
+          password:
+            key: REDIS_PASSWORD
+        description: standard
+        metadata:
+          costs:
+          - amount:
+              usd: 0.0
+            unit: MONTHLY
+          bullets:
+          - Redis 2.8 running inside a Docker container
+    - id: 24736f4a-72b8-4298-96f7-b48c4045ddfd
+      name: mysql56
+      description: MySQL 5.6 service for application development and testing
+      bindable: true
+      tags:
+      - mysql56
+      - mysql
+      - relational
+      metadata:
+        displayName: MySQL 5.6
+        longDescription: A MySQL 5.6 service for development and testing running inside
+          a Docker container
+        providerDisplayName: cloud.gov
+        documentationUrl: http://docs.cloud.gov
+        supportUrl: http://docs.cloud.gov
+      dashboard_client:
+        id: p-mysql56-client
+        secret: (( meta.service_secrets.mysql ))
+        redirect_uri: https://cf-containers-broker.18f.gov/manage/auth/cloudfoundry/callback
+      plans:
+      - id: d42fc3cc-1341-4aa3-866e-01bc5243dc2e
+        name: standard
+        container:
+          backend: docker
+          image: frodenas/mysql
+          tag: latest
+          persistent_volumes:
+          - "/data"
+        credentials:
+          username:
+            key: MYSQL_USERNAME
+          password:
+            key: MYSQL_PASSWORD
+          dbname:
+            key: MYSQL_DBNAME
+          uri:
+            prefix: mysql
+        description: standard
+        metadata:
+          costs:
+          - amount:
+              usd: 0
+            unit: MONTHLY
+          bullets:
+          - MySQL 5.6 running inside a Docker container
+    - id: 5536357c-159f-4592-937f-c1d8b1efbe14
+      name: mongodb26-swarm
+      description: MongoDB 2.6 service for application development and testing
+      bindable: true
+      tags:
+      - mongodb26
+      - mongodb
+      - document
+      metadata:
+        displayName: MongoDB 2.6
+        longDescription: A MongoDB 2.6 service for development and testing running
+          inside a Docker container
+        providerDisplayName: cloud.gov
+        documentationUrl: http://docs.cloud.gov
+        supportUrl: http://docs.cloud.gov
+      dashboard_client:
+        id: p-swarm-mongodb26-client
+        secret: (( meta.service_secrets.mongo ))
+        redirect_uri: https://cf-containers-broker.18f.gov/manage/auth/cloudfoundry/callback
+      plans:
+      - id: e4fa49fe-7dab-4094-a6d0-36d4052d6afc
+        name: standard
+        container:
+          backend: docker
+          image: frodenas/mongodb
+          tag: '2.6'
+          command: "--smallfiles --httpinterface"
+          persistent_volumes:
+          - "/data"
+        credentials:
+          username:
+            key: MONGODB_USERNAME
+          password:
+            key: MONGODB_PASSWORD
+          dbname:
+            key: MONGODB_DBNAME
+          uri:
+            prefix: mongodb
+            port: 27017/tcp
+        description: Free Trial
+        metadata:
+          costs:
+          - amount:
+              usd: 0.0
+            unit: MONTHLY
+          bullets:
+          - Dedicated 2.6 MongoDB server
+          - MongoDB 2.6 running inside a Docker container
+    - id: b76f6d51-f701-48c2-9614-7240fe580346
+      name: couchdb16
+      description: CouchDB 1.6 service for application development and testing
+      bindable: true
+      tags:
+      - couchdb16
+      - couchdb
+      - document
+      metadata:
+        displayName: CouchDB 1.6
+        longDescription: A CouchDB 1.6 service for development and testing running
+          inside a Docker container
+        providerDisplayName: cloud.gov
+        documentationUrl: http://docs.cloud.gov
+        supportUrl: http://docs.cloud.gov
+      dashboard_client:
+        id: p-couchdb16-client
+        secret: (( meta.service_secrets.couch ))
+        redirect_uri: https://cf-containers-broker.18f.gov/manage/auth/cloudfoundry/callback
+      plans:
+      - id: 3a35568d-aea9-447f-9e39-363c2e9da193
+        name: free
+        container:
+          backend: docker
+          image: frodenas/couchdb
+          tag: '1.6'
+        credentials:
+          username:
+            key: COUCHDB_USERNAME
+          password:
+            key: COUCHDB_PASSWORD
+          dbname:
+            key: COUCHDB_DBNAME
+          uri:
+            prefix: couchdb
+        description: Free Trial
+        metadata:
+          costs:
+          - amount:
+              usd: 0.0
+            unit: MONTHLY
+          bullets:
+          - Dedicated CouchDB 1.6 server
+          - CouchDB 1.6 running inside a Docker container
