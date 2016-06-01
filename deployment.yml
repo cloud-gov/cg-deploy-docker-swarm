@@ -2,11 +2,11 @@ meta:
   environment: ~
   releases:
   - name: docker
-    version: latest
+    version: 15
   - name: newrelic
-    version: latest
+    version: 11
   - name: collectd
-    version: latest
+    version: 10
   default_env:
     # Default vcap & root password on deployed VMs (ie c1oudc0w)
     # Generated using mkpasswd -m sha-512

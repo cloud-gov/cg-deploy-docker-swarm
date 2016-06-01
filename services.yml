@@ -59,7 +59,7 @@ properties:
       - elasticsearch
       - search
       metadata:
-        displayName: 'Elasticsearch 1.7.1: 3G / 3x CPU'
+        displayName: (( "Elasticsearch 1.7.1: 3G / 3x CPU" ))
         longDescription: A Elasticsearch 1.7.1 service
         providerDisplayName: 18F
         documentationUrl: ''
@@ -168,7 +168,7 @@ properties:
       - elasticsearch
       - search
       metadata:
-        displayName: 'Elasticsearch 1.7.5: 6G / 6x CPU'
+        displayName: (( "Elasticsearch 1.7.5: 6G / 6x CPU" ))
         longDescription: A Elasticsearch 1.7.5 service
         providerDisplayName: 18F
         documentationUrl: ''
