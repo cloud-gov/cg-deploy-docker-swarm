@@ -7,7 +7,6 @@ jobs:
     - get: docker-swarm-config
       trigger: true
     - get: common-prod
-    - get: cg-s3-collectd-release
     - get: docker-swarm-stemcell
   - task: docker-swarm-manifest
     file: pipeline-tasks/spiff-merge.yml
@@ -15,6 +14,7 @@ jobs:
       inputs:
         - name: pipeline-tasks
         - name: docker-swarm-config
+        # is this needed? -@afeld
         - name: common-prod
       params:
         OUTPUT_FILE: spiff-merge/manifest.yml
@@ -25,7 +25,7 @@ jobs:
       cert: common-prod/boshCA.crt
       manifest: spiff-merge/manifest.yml
       releases:
-        - cg-s3-collectd-release/collectd*.tgz
+        - cg-s3-docker-swarm-release/docker-swarm*.tgz
       stemcells:
         - docker-swarm-stemcell/*.tgz
     on_failure:
@@ -59,13 +59,13 @@ resources:
     secrets_passphrase: {{docker-swarm-production-private-passphrase}}
     bosh_cert: bosh.pem
 
-- name: cg-s3-collectd-release
+- name: cg-s3-docker-swarm-release
   type: s3
   source:
     access_key_id: {{s3-bosh-releases-access-key-id}}
     bucket: {{s3-bosh-releases-bucket}}
     private: true
-    regexp: collectd-(.*).tgz
+    regexp: docker-swarm-(.*).tgz
     secret_access_key: {{s3-bosh-releases-secret-access-key}}
 
 - name: docker-swarm-config

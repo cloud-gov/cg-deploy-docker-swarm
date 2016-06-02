@@ -5,3 +5,5 @@ manifest.production.yml
 secrets.yml
 secrets.staging.yml
 secrets.production.yml
+
+credentials.yml
