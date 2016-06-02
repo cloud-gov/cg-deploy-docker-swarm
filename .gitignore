@@ -1,2 +1,7 @@
 manifest.yml
+manifest.staging.yml
+manifest.production.yml
+
 secrets.yml
+secrets.staging.yml
+secrets.production.yml
