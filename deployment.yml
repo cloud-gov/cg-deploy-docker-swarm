@@ -154,7 +154,8 @@ jobs:
     - gateway
 properties:
   collectd:
-    riemann_server: 0.monitoring.monitoring.monitoring-prod.bosh
+    # see https://github.com/18F/cg-deploy-monitoring/
+    riemann_server: (( merge ))
   newrelic: (( merge ))
   docker:
     tcp_address: 0.0.0.0
