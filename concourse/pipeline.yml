@@ -1,13 +1,16 @@
 ---
 jobs:
-- name: deploy-docker-swarm-production
+- name: deploy-docker-swarm-staging
   plan:
   - aggregate:
     - get: pipeline-tasks
     - get: docker-swarm-config
       trigger: true
-    - get: common-prod
+    - get: common-stage
     - get: docker-swarm-stemcell
+    - get: cg-s3-docker-swarm-release
+    - get: cg-s3-newrelic-release
+    - get: cg-s3-collectd-release
   - task: docker-swarm-manifest
     file: pipeline-tasks/spiff-merge.yml
     config:
@@ -15,24 +18,26 @@ jobs:
         - name: pipeline-tasks
         - name: docker-swarm-config
         # is this needed? -@afeld
-        - name: common-prod
+        - name: common-stage
       params:
         OUTPUT_FILE: spiff-merge/manifest.yml
-        SOURCE_FILE: docker-swarm-config/docker-swarm.yml
-        MERGE_FILES: common-prod/secrets.yml
-  - put: docker-swarm-production-deployment
+        SOURCE_FILE: docker-swarm-config/bosh/deployment.yml
+        MERGE_FILES: docker-swarm-config/bosh/jobs-staging.yml docker-swarm-config/bosh/services.yml common-stage/secrets.yml
+  - put: docker-swarm-staging-deployment
     params:
-      cert: common-prod/boshCA.crt
+      cert: common-stage/boshCA.crt
       manifest: spiff-merge/manifest.yml
       releases:
-        - cg-s3-docker-swarm-release/docker-swarm*.tgz
+        - cg-s3-docker-swarm-release/docker-boshrelease-*.tgz
+        - cg-s3-newrelic-release/newrelic-*.tgz
+        - cg-s3-collectd-release/collectd-*.tgz
       stemcells:
         - docker-swarm-stemcell/*.tgz
     on_failure:
       put: slack
       params:
         text: |
-          :x: FAILED to deploy docker-swarm on production
+          :x: FAILED to deploy docker-swarm on staging
           <https://ci.cloud.gov/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
         channel: {{slack-channel}}
         username: {{slack-username}}
@@ -41,7 +46,7 @@ jobs:
       put: slack
       params:
         text: |
-          :white_check_mark: Successfully deployed docker-swarm on production
+          :white_check_mark: Successfully deployed docker-swarm on staging
           <https://ci.cloud.gov/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
         channel: {{slack-channel}}
         username: {{slack-username}}
@@ -49,24 +54,15 @@ jobs:
 
 
 resources:
-- name: common-prod
+- name: common-stage
   type: cg-common
   source:
-    bucket_name: {{docker-swarm-private-bucket-production}}
-    access_key_id: {{docker-swarm-private-access-key-id-production}}
-    secret_access_key: {{docker-swarm-private-secret-access-key-production}}
-    secrets_file: docker-swarm.yml
-    secrets_passphrase: {{docker-swarm-production-private-passphrase}}
+    bucket_name: {{docker-swarm-private-bucket-staging}}
+    access_key_id: {{docker-swarm-private-access-key-id-staging}}
+    secret_access_key: {{docker-swarm-private-secret-access-key-staging}}
+    secrets_file: docker-swarm-staging.yml
+    secrets_passphrase: {{docker-swarm-staging-private-passphrase}}
     bosh_cert: bosh.pem
-
-- name: cg-s3-docker-swarm-release
-  type: s3
-  source:
-    access_key_id: {{s3-bosh-releases-access-key-id}}
-    bucket: {{s3-bosh-releases-bucket}}
-    private: true
-    regexp: docker-swarm-(.*).tgz
-    secret_access_key: {{s3-bosh-releases-secret-access-key}}
 
 - name: docker-swarm-config
   type: git
@@ -79,13 +75,40 @@ resources:
   source:
     name: {{docker-swarm-stemcell}}
 
-- name: docker-swarm-production-deployment
+- name: cg-s3-docker-swarm-release
+  type: s3
+  source:
+    access_key_id: {{s3-bosh-releases-access-key-id}}
+    bucket: {{s3-bosh-releases-bucket}}
+    private: true
+    regexp: docker-boshrelease-(.*).tgz
+    secret_access_key: {{s3-bosh-releases-secret-access-key}}
+
+- name: cg-s3-newrelic-release
+  type: s3
+  source:
+    access_key_id: {{s3-bosh-releases-access-key-id}}
+    bucket: {{s3-bosh-releases-bucket}}
+    private: true
+    regexp: newrelic-(\d+).tgz
+    secret_access_key: {{s3-bosh-releases-secret-access-key}}
+
+- name: cg-s3-collectd-release
+  type: s3
+  source:
+    access_key_id: {{s3-bosh-releases-access-key-id}}
+    bucket: {{s3-bosh-releases-bucket}}
+    private: true
+    regexp: collectd-(\d+).tgz
+    secret_access_key: {{s3-bosh-releases-secret-access-key}}
+
+- name: docker-swarm-staging-deployment
   type: 18f-bosh-deployment
   source:
-    target: {{docker-swarm-production-deployment-bosh-target}}
-    username: {{docker-swarm-production-deployment-bosh-username}}
-    password: {{docker-swarm-production-deployment-bosh-password}}
-    deployment: {{docker-swarm-production-deployment-bosh-deployment}}
+    target: {{docker-swarm-staging-deployment-bosh-target}}
+    username: {{docker-swarm-staging-deployment-bosh-username}}
+    password: {{docker-swarm-staging-deployment-bosh-password}}
+    deployment: {{docker-swarm-staging-deployment-bosh-deployment}}
     ignore_ssl: false
 
 - name: pipeline-tasks
