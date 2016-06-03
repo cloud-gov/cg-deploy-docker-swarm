@@ -3,6 +3,8 @@ jobs:
   templates:
   - name: docker
     release: docker
+  - name: newrelic-monitor
+    release: newrelic
   instances: 2
   resource_pool: default
   persistent_disk_pool: docker-ssd
