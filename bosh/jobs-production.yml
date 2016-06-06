@@ -13,6 +13,7 @@ jobs:
     default:
     - dns
     - gateway
+    <<: (( merge ))
 - name: docker-highmem
   templates:
   - name: docker
@@ -29,6 +30,7 @@ jobs:
     default:
     - dns
     - gateway
+    <<: (( merge ))
 - name: docker-compute-reserved
   templates:
   - name: docker
@@ -43,6 +45,7 @@ jobs:
     default:
     - dns
     - gateway
+    <<: (( merge ))
 - name: docker
   templates:
   - name: docker
@@ -57,6 +60,7 @@ jobs:
     default:
     - dns
     - gateway
+    <<: (( merge ))
 
 properties:
   collectd:
