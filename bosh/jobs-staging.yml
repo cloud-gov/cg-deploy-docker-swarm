@@ -20,5 +20,5 @@ properties:
     riemann_server: ""
   swarm_manager:
     docker_nodes:
-    - 0.docker.default.cf-docker-swarm-broker.bosh
-    - 1.docker.default.cf-docker-swarm-broker.bosh
+    - 0.docker.default.cf-docker-swarm-broker-staging.bosh
+    - 1.docker.default.cf-docker-swarm-broker-staging.bosh

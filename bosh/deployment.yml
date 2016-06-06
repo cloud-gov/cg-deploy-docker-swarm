@@ -20,7 +20,7 @@ director_uuid: (( merge ))
 releases: (( merge || meta.releases ))
 
 compilation:
-  workers: 1
+  workers: 3
   network: default
   reuse_compilation_vms: true
   cloud_properties:
