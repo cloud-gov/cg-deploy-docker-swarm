@@ -119,6 +119,7 @@ jobs:
     default:
     - dns
     - gateway
+    <<: (( merge ))
 - name: broker-registrar
   templates:
   - name: broker-registrar
@@ -131,6 +132,7 @@ jobs:
     default:
     - dns
     - gateway
+    <<: (( merge ))
 - name: fetch-containers
   templates:
   - name: fetch-containers
@@ -152,6 +154,7 @@ jobs:
     default:
     - dns
     - gateway
+    <<: (( merge ))
 properties:
   collectd:
     # see https://github.com/18F/cg-deploy-monitoring/

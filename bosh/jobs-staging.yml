@@ -13,6 +13,7 @@ jobs:
     default:
     - dns
     - gateway
+    <<: (( merge ))
 
 
 properties:

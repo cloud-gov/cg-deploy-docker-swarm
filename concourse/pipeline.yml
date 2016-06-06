@@ -17,7 +17,6 @@ jobs:
       inputs:
         - name: pipeline-tasks
         - name: docker-swarm-config
-        # is this needed? -@afeld
         - name: common-stage
       params:
         OUTPUT_FILE: spiff-merge/manifest.yml
