@@ -51,6 +51,56 @@ jobs:
         username: {{slack-username}}
         icon_url: {{slack-icon-url}}
 
+- name: deploy-docker-swarm-prod
+  plan:
+  - aggregate:
+    - get: pipeline-tasks
+    - get: docker-swarm-config
+      trigger: true
+    - get: common-prod
+    - get: docker-swarm-stemcell
+    - get: cg-s3-docker-swarm-release
+    - get: cg-s3-newrelic-release
+    - get: cg-s3-collectd-release
+  - task: docker-swarm-manifest
+    file: pipeline-tasks/spiff-merge.yml
+    config:
+      inputs:
+        - name: pipeline-tasks
+        - name: docker-swarm-config
+        - name: common-prod
+      params:
+        OUTPUT_FILE: spiff-merge/manifest.yml
+        SOURCE_FILE: docker-swarm-config/bosh/deployment.yml
+        MERGE_FILES: docker-swarm-config/bosh/jobs-production.yml docker-swarm-config/bosh/services.yml common-prod/secrets.yml
+  - put: docker-swarm-prod-deployment
+    params:
+      cert: common-prod/boshCA.crt
+      manifest: spiff-merge/manifest.yml
+      releases:
+        - cg-s3-docker-swarm-release/docker-boshrelease-*.tgz
+        - cg-s3-newrelic-release/newrelic-*.tgz
+        - cg-s3-collectd-release/collectd-*.tgz
+      stemcells:
+        - docker-swarm-stemcell/*.tgz
+    on_failure:
+      put: slack
+      params:
+        text: |
+          :x: FAILED to deploy docker-swarm on prod
+          <https://ci.cloud.gov/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+        channel: {{slack-channel}}
+        username: {{slack-username}}
+        icon_url: {{slack-icon-url}}
+    on_success:
+      put: slack
+      params:
+        text: |
+          :white_check_mark: Successfully deployed docker-swarm on prod
+          <https://ci.cloud.gov/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME|View build details>
+        channel: {{slack-channel}}
+        username: {{slack-username}}
+        icon_url: {{slack-icon-url}}
 
 resources:
 - name: common-stage
@@ -61,6 +111,16 @@ resources:
     secret_access_key: {{docker-swarm-private-secret-access-key-staging}}
     secrets_file: docker-swarm-staging.yml
     secrets_passphrase: {{docker-swarm-staging-private-passphrase}}
+    bosh_cert: bosh.pem
+
+- name: common-prod
+  type: cg-common
+  source:
+    bucket_name: {{docker-swarm-private-bucket-prod}}
+    access_key_id: {{docker-swarm-private-access-key-id-prod}}
+    secret_access_key: {{docker-swarm-private-secret-access-key-prod}}
+    secrets_file: docker-swarm-prod.yml
+    secrets_passphrase: {{docker-swarm-prod-private-passphrase}}
     bosh_cert: bosh.pem
 
 - name: docker-swarm-config
@@ -108,6 +168,15 @@ resources:
     username: {{docker-swarm-staging-deployment-bosh-username}}
     password: {{docker-swarm-staging-deployment-bosh-password}}
     deployment: {{docker-swarm-staging-deployment-bosh-deployment}}
+    ignore_ssl: false
+
+- name: docker-swarm-prod-deployment
+  type: 18f-bosh-deployment
+  source:
+    target: {{docker-swarm-prod-deployment-bosh-target}}
+    username: {{docker-swarm-prod-deployment-bosh-username}}
+    password: {{docker-swarm-prod-deployment-bosh-password}}
+    deployment: {{docker-swarm-prod-deployment-bosh-deployment}}
     ignore_ssl: false
 
 - name: pipeline-tasks
