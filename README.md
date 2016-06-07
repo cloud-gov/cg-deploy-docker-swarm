@@ -4,18 +4,16 @@ This repo contains the [Concourse](http://concourse.ci/) pipeline and [BOSH](htt
 
 ## Usage
 
-1. Install [spiff](https://github.com/cloudfoundry-incubator/spiff).
 1. Create a secrets file (below), or get a copy from another cloud.gov team member.
 
     ```bash
-    cp bosh/secrets.example.yml bosh/secrets.staging.yml
+    cp concourse/credentials.example.yml concourse/credentials.yml
     ```
 
-1. Fill in [`bosh/secrets.staging.yml`](bosh/secrets.example.yml).
-1. Generate the final BOSH manifest.
+1. Add pipeline to concourse.
 
     ```bash
-    ./bosh/generate.sh staging
+    fly -t <my-target> set-pipeline -p deploy-docker-swarm -c concourse/pipeline.yml -l concourse/credentials.yml
     ```
 
-This will produce a `bosh/manifest.staging.yml` file, which can be deployed with BOSH. Note that you can do all of these steps using `production` instead of `staging`.
+Note: Releases for docker, newrelic, and collectd must be uploaded to bosh before running pipelines; see [bosh/deployment.yml](bosh/deployment.yml) for release versions.
