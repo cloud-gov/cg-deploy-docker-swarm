@@ -1,5 +1,6 @@
 meta:
   environment: ~
+  availability_zone: ~
   releases:
   - name: docker
     version: 15
@@ -50,6 +51,7 @@ resource_pools:
     version: 3202
   cloud_properties:
     instance_type: m4.xlarge
+    availability_zone: (( meta.availability_zone ))
     ephemeral_disk:
       size: 16384
       type: gp2
@@ -61,6 +63,7 @@ resource_pools:
     version: 3148
   cloud_properties:
     instance_type: c4.2xlarge
+    availability_zone: (( meta.availability_zone ))
     ephemeral_disk:
       size: 16384
       type: gp2
@@ -72,6 +75,7 @@ resource_pools:
     version: 3062
   cloud_properties:
     instance_type: c4.xlarge
+    availability_zone: (( meta.availability_zone ))
     ephemeral_disk:
       size: 16384
       type: gp2
@@ -83,6 +87,7 @@ resource_pools:
     version: 2989
   cloud_properties:
     instance_type: m3.large
+    availability_zone: (( meta.availability_zone ))
     ephemeral_disk:
       size: 16384
       type: gp2
@@ -94,6 +99,7 @@ resource_pools:
     version: 2989
   cloud_properties:
     instance_type: m3.medium
+    availability_zone: (( meta.availability_zone ))
     ephemeral_disk:
       size: 2048
       type: gp2
@@ -105,6 +111,7 @@ resource_pools:
     version: 2989
   cloud_properties:
     instance_type: m3.medium
+    availability_zone: (( meta.availability_zone ))
     ephemeral_disk:
       size: 2048
       type: gp2
