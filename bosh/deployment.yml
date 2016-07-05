@@ -13,12 +13,20 @@ meta:
     # Generated using mkpasswd -m sha-512
     bosh:
       password: (( merge || "$6$4gDD3aV0rdqlrKC$2axHCxGKIObs6tAmMTqYCspcdvQXh3JJcvWOY2WGb4SrdXtnCyNaWlrf3WEqvYR2MYizEGp3kMmbpwBC6jsHt0" ))
-
+  swarm_templates:
+  - name: cf-containers-broker
+    release: docker
+  - name: swarm_manager
+    release: docker
+  - name: newrelic-monitor
+    release: newrelic
+  hardening_releases: (( merge ))
+  hardening_templates: (( merge ))
 
 name: (( meta.environment ))
 director_uuid: (( merge ))
 
-releases: (( merge || meta.releases ))
+releases: (( merge || meta.releases meta.hardening_releases ))
 
 compilation:
   workers: 3
@@ -120,13 +128,7 @@ resource_pools:
 jobs:
 - <<: (( merge ))
 - name: broker
-  templates:
-  - name: cf-containers-broker
-    release: docker
-  - name: swarm_manager
-    release: docker
-  - name: newrelic-monitor
-    release: newrelic
+  templates: (( meta.swarm_templates meta.hardening_templates ))
   instances: 1
   resource_pool: broker
   networks:

@@ -1,10 +1,16 @@
-jobs:
-- name: docker
-  templates:
+meta:
+  docker_templates:
   - name: docker
     release: docker
   - name: newrelic-monitor
     release: newrelic
+  - name: collectd
+    release: collectd
+  hardening_templates: (( merge ))
+
+jobs:
+- name: docker
+  templates: (( meta.docker_templates meta.hardening_templates ))
   instances: 2
   resource_pool: default
   persistent_disk_pool: docker-ssd

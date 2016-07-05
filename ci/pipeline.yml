@@ -21,7 +21,7 @@ jobs:
       params:
         OUTPUT_FILE: spiff-merge/manifest.yml
         SOURCE_FILE: docker-swarm-config/bosh/deployment.yml
-        MERGE_FILES: docker-swarm-config/bosh/jobs-staging.yml docker-swarm-config/bosh/services.yml common-stage/secrets.yml
+        MERGE_FILES: docker-swarm-config/bosh/jobs-staging.yml docker-swarm-config/bosh/services.yml docker-swarm-config/bosh/hardening.yml common-stage/secrets.yml
   - put: docker-swarm-staging-deployment
     params:
       cert: common-stage/boshCA.crt
