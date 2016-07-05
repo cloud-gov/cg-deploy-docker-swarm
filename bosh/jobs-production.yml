@@ -1,10 +1,16 @@
-jobs:
-- name: docker-compute
-  templates:
+meta:
+  docker_templates:
   - name: docker
     release: docker
   - name: newrelic-monitor
     release: newrelic
+  - name: collectd
+    release: collectd
+  hardening_templates: (( merge ))
+
+jobs:
+- name: docker-compute
+  templates: (( meta.docker_templates meta.hardening_templates ))
   instances: 5
   resource_pool: compute
   persistent_disk_pool: docker-ssd
@@ -15,13 +21,7 @@ jobs:
     - gateway
     <<: (( merge ))
 - name: docker-highmem
-  templates:
-  - name: docker
-    release: docker
-  - name: newrelic-monitor
-    release: newrelic
-  - name: collectd
-    release: collectd
+  templates: (( meta.docker_templates meta.hardening_templates ))
   instances: 3
   resource_pool: highmem
   persistent_disk_pool: docker-ssd
@@ -32,11 +32,7 @@ jobs:
     - gateway
     <<: (( merge ))
 - name: docker-compute-reserved
-  templates:
-  - name: docker
-    release: docker
-  - name: newrelic-monitor
-    release: newrelic
+  templates: (( meta.docker_templates meta.hardening_templates ))
   instances: 1
   resource_pool: compute-reserved
   persistent_disk_pool: docker-ssd

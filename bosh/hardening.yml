@@ -1,0 +1,31 @@
+meta:
+  hardening_releases:
+  - name: fisma
+    version: latest
+  - name: tripwire
+    version: latest
+  - name: awslogs
+    version: latest
+  - name: nessus-agent
+    version: latest
+  - name: riemannc
+    version: latest
+  - name: clamav
+    version: latest
+  - name: snort
+    version: latest
+  hardening_templates:
+  - name: harden
+    release: fisma
+  - name: tripwire
+    release: tripwire
+  - name: awslogs
+    release: awslogs
+  - name: nessus-agent
+    release: nessus-agent
+  - name: riemannc
+    release: riemannc
+  - name: clamav
+    release: clamav
+  - name: snort
+    release: snort
