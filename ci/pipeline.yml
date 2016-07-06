@@ -72,7 +72,7 @@ jobs:
       params:
         OUTPUT_FILE: spiff-merge/manifest.yml
         SOURCE_FILE: docker-swarm-config/bosh/deployment.yml
-        MERGE_FILES: docker-swarm-config/bosh/jobs-production.yml docker-swarm-config/bosh/services.yml common-prod/secrets.yml
+        MERGE_FILES: docker-swarm-config/bosh/jobs-production.yml docker-swarm-config/bosh/services.yml docker-swarm-config/bosh/hardening.yml common-prod/secrets.yml
   - put: docker-swarm-prod-deployment
     params:
       cert: common-prod/boshCA.crt
