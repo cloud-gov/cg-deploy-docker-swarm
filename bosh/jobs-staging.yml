@@ -23,6 +23,7 @@ jobs:
 
 
 properties:
+  <<: (( merge ))
   collectd:
     riemann_server: ""
   swarm_manager:
