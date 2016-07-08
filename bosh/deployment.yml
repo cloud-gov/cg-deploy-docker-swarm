@@ -177,6 +177,18 @@ properties:
     # see https://github.com/18F/cg-deploy-monitoring/
     riemann_server: (( merge ))
   newrelic: (( merge ))
+  tripwire:
+    localpass: (( merge ))
+    sitepass: (( merge ))
+  awslogs:
+    access_key: (( merge ))
+    secret_access_key: (( merge ))
+    region: (( merge ))
+  nessus-agent:
+    key: (( merge ))
+    server: (( merge ))
+    port: (( merge ))
+    group: (( merge ))
   docker:
     tcp_address: 0.0.0.0
   swarm_manager:

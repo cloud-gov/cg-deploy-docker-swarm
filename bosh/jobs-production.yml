@@ -59,7 +59,6 @@ jobs:
     <<: (( merge ))
 
 properties:
-  <<: (( merge ))
   collectd:
     riemann_server: 0.monitoring.monitoring.monitoring-prod.bosh
   swarm_manager:
