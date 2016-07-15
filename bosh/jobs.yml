@@ -11,7 +11,7 @@ meta:
 jobs:
 - name: docker-compute
   templates: (( meta.docker_templates meta.hardening_templates ))
-  instances: 5
+  instances: (( merge ))
   resource_pool: compute
   persistent_disk_pool: docker-ssd
   networks:
@@ -22,7 +22,7 @@ jobs:
     <<: (( merge ))
 - name: docker-highmem
   templates: (( meta.docker_templates meta.hardening_templates ))
-  instances: 3
+  instances: (( merge ))
   resource_pool: highmem
   persistent_disk_pool: docker-ssd
   networks:
@@ -33,7 +33,7 @@ jobs:
     <<: (( merge ))
 - name: docker-compute-reserved
   templates: (( meta.docker_templates meta.hardening_templates ))
-  instances: 1
+  instances: (( merge ))
   resource_pool: compute-reserved
   persistent_disk_pool: docker-ssd
   networks:
@@ -48,7 +48,7 @@ jobs:
     release: docker
   - name: newrelic-monitor
     release: newrelic
-  instances: 5
+  instances: (( merge ))
   resource_pool: default
   persistent_disk_pool: docker-ssd
   networks:
@@ -60,20 +60,9 @@ jobs:
 
 properties:
   collectd:
-    riemann_server: 0.monitoring.monitoring.monitoring-prod.bosh
+    riemann_server: (( merge ))
   swarm_manager:
     docker_nodes:
     - 0.docker.default.cf-docker-swarm-broker.bosh
     - 1.docker.default.cf-docker-swarm-broker.bosh
-    - 2.docker.default.cf-docker-swarm-broker.bosh
-    - 3.docker.default.cf-docker-swarm-broker.bosh
-    - 4.docker.default.cf-docker-swarm-broker.bosh
-    - 0.docker-compute.default.cf-docker-swarm-broker.bosh
-    - 1.docker-compute.default.cf-docker-swarm-broker.bosh
-    - 2.docker-compute.default.cf-docker-swarm-broker.bosh
-    - 3.docker-compute.default.cf-docker-swarm-broker.bosh
-    - 4.docker-compute.default.cf-docker-swarm-broker.bosh
-    - 0.docker-compute-reserved.default.cf-docker-swarm-broker.bosh
-    - 0.docker-highmem.default.cf-docker-swarm-broker.bosh
-    - 1.docker-highmem.default.cf-docker-swarm-broker.bosh
-    - 2.docker-highmem.default.cf-docker-swarm-broker.bosh
+    <<: (( merge ))
